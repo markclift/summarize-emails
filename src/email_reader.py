@@ -63,21 +63,17 @@ def get_unprocessed_emails(service):
         # Retrieve label IDs for "Newsletter" and "Processed".
         newsletter_label_id = get_label_id(service, "Newsletter")
         processed_label_id = get_label_id(service, "Processed")
-        
-        # Use the Gmail API to fetch these emails.
-        response = service.users().messages().list(userId='me', 
-            q=f"label:{newsletter_label_id} -label:{processed_label_id}").execute()
-        messages = []
-        if 'messages' in response:
-            messages.extend(response['messages'])
 
-        # If there are more than 100 emails, 'nextPageToken' is returned in the response.
+        # Use the Gmail API to fetch these emails.
+        response = {'nextPageToken': None}
+        messages = []
         while 'nextPageToken' in response:
             page_token = response['nextPageToken']
             response = service.users().messages().list(userId='me', q=f"label:{newsletter_label_id} -label:{processed_label_id}",
                 pageToken=page_token).execute()
-            messages.extend(response['messages'])
-
+            if 'messages' in response:
+                messages.extend(response['messages'])
+        
         return messages
 
     except (HttpError, RefreshError) as error:
