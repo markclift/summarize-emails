@@ -7,6 +7,7 @@ import os
 import pickle
 from email.mime.text import MIMEText
 import base64
+from datetime import datetime, timedelta
 
 # If modifying these SCOPES, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
@@ -26,9 +27,8 @@ def authenticate_gmail():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                '../gmail-credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
+            flow = InstalledAppFlow.from_client_secrets_file('./gmail-credentials.json', SCOPES)
+            creds = flow.run_local_server(port=58599)
         
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
@@ -57,24 +57,46 @@ def get_label_id(service, label_name):
 
     return None
 
-def get_unprocessed_emails(service):
-    """Fetch all emails with "Newsletter" label and without "Processed" label."""
+def get_unprocessed_emails(service, days):
+    """Fetch all emails with "3 News/Crypto News" label and without "Processed" label."""
+    start_date = datetime.now() - timedelta(days=days)
+    start_date_formatted = start_date.strftime("%Y/%m/%d")
     try:
         # Retrieve label IDs for "Newsletter" and "Processed".
-        newsletter_label_id = get_label_id(service, "Newsletter")
-        processed_label_id = get_label_id(service, "Processed")
+        label_crypto_news_name = "3-news-crypto-news"
+        label_crypto_news_id = get_label_id(service, "3 News/Crypto News")
+        label_processed_name = "Processed"
+        label_processed_id = get_label_id(service, label_processed_name)
 
         # Use the Gmail API to fetch these emails.
         response = {'nextPageToken': None}
-        messages = []
+        email_ids = []
         while 'nextPageToken' in response:
             page_token = response['nextPageToken']
-            response = service.users().messages().list(userId='me', q=f"label:{newsletter_label_id} -label:{processed_label_id}",
-                pageToken=page_token).execute()
+            q = f"label:{label_crypto_news_name} -label:{label_processed_name} after:{start_date_formatted}"
+            response = service.users().messages().list(userId='me', q=q, pageToken=page_token).execute()
             if 'messages' in response:
-                messages.extend(response['messages'])
+                email_ids.extend(response['messages'])
+
+        emails=[]
+        for id in email_ids:
+            response = service.users().messages().get(userId='me', id=id['id']).execute()
+            if 'payload' in response:
+                body = response['payload']['parts'][0]['body']['data']
+                decoded_body = base64.urlsafe_b64decode(body).decode('utf-8')
+                headers = response['payload']['headers']
+                from_value = next((header['value'] for header in headers if header['name'] == 'From'), None)
+                date_value = next((header['value'] for header in headers if header['name'] == 'Date'), None)
+                subject_value = next((header['value'] for header in headers if header['name'] == 'Subject'), None)
+                emails.append({
+                    'id': id['id'],
+                    'body': decoded_body,
+                    'from': from_value,
+                    'subject': subject_value,
+                    'date': date_value
+                })
         
-        return messages
+        return emails
 
     except (HttpError, RefreshError) as error:
         print(f'An error occurred: {error}')
