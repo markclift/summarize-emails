@@ -1,4 +1,5 @@
 from parsel import Selector
+from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 from playwright.sync_api._generated import Page
 
@@ -47,25 +48,38 @@ def parse_tweets(selector: Selector):
     
     return tweets_consolidated_string
 
+def simulate_browser(pw, url, wait_for_selector=None):
+    browser = pw.chromium.launch(headless=True)
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+    context = browser.new_context(user_agent=user_agent, viewport={"width": 1920, "height": 1080})
+    # Block images, CSS, JS, videos, audio, and fonts
+    context.route('**/*.{png,jpg,jpeg,svg,gif,webp,css,js,mp4,webm,ogg,mp3,wav,flac,woff,woff2,eot,ttf,otf}', lambda route, request: route.abort())
+    page = context.new_page()
+    try:
+        if wait_for_selector:
+            page.goto(url)
+            page.wait_for_selector(wait_for_selector)
+        else:
+            page.goto(url, wait_until="networkidle")
+    except Exception as e: # Catch all exceptions
+        print(f"An error occurred while extracting content from {url}\n{e}\nCould be because the tweet no longer exists")
+    finally:
+        url = page.url
+        content = page.content()
+        page.close()
+        browser.close()
+    return url, content
+
 def scrape_tweet(url: str):
-    """
-    Scrape tweet and replies from tweet page like:
-    https://twitter.com/Scrapfly_dev/status/1587431468141318146
-    """
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
-        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-        context = browser.new_context(user_agent=user_agent, viewport={"width": 1920, "height": 1080})
-        # Block images, CSS, JS, videos, audio, and fonts
-        context.route('**/*.{png,jpg,jpeg,svg,gif,webp,css,js,mp4,webm,ogg,mp3,wav,flac,woff,woff2,eot,ttf,otf}', lambda route, request: route.abort())
-        page = context.new_page()
-        # go to url
-        page.goto(url)
-        # wait for content to load
-        page.wait_for_selector("//article[@data-testid='tweet']")  
-        # retrieve final page HTML:
-        html = page.content()
-        # parse it for data:
+        final_url, html = simulate_browser(pw, url, "//article[@data-testid='tweet']")
         selector = Selector(html)
         tweets_string = parse_tweets(selector)
-        return tweets_string
+        return final_url, tweets_string
+    
+def scrape_page(url: str):
+    with sync_playwright() as pw:
+        final_url, html = simulate_browser(pw, url)
+        soup = BeautifulSoup(html, 'html.parser')
+        clean_text = soup.get_text()
+        return final_url, clean_text

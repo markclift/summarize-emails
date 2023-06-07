@@ -1,0 +1,126 @@
+{
+  "MODELS": {
+    "SUMMARIZE_EMAIL": "gpt-3.5-turbo",
+    "SUMMARIZE_LINKS": "gpt-3.5-turbo",
+    "CONSOLIDATE_TITLES": "gpt-4",
+    "MAP_REDUCE_TOPICS": "text-davinci-003"
+  },
+  "EMAIL_LIST": [
+    {
+      "subject": "😎 Crypto Newsletter Summary!",
+      "labels": ["3-news-crypto-news"],
+      "crawl_links": true
+    },
+    {
+      "subject": "🤖 AI Newsletter Summary!",
+      "labels": ["3-news-ai-news"],
+      "crawl_links": false
+    },
+    {
+      "subject": "🤓 John Authors Summary!",
+      "labels": ["3-news-john-authers"],
+      "crawl_links": false
+    },
+    {
+      "subject": "📱 Tech News Summary!",
+      "labels": ["3-news-tech-news", "3-news-stratechery"],
+      "crawl_links": false
+    }
+  ],
+  "URLS_TO_IGNORE": [
+    "milkroad.com",
+    "amazon.com",
+    "dune.com",
+    "coingecko.com",
+    "instagram.com",
+    "linkedin.com",
+    "substackcdn.com",
+    "etherscan.io",
+    "bscscan.com",
+    "tokenterminal.com",
+    "snowtrace.io",
+    "discord.com",
+    "pancakeswap.finance",
+    "youtube.com",
+    "thisweekindefi.substack.com",
+    "media.beehiiv.com",
+    "t.me",
+    "theblock.co/data",
+    "open.spotify.com",
+    "podcasts.apple.com",
+    "blockworks.co/newsletter/view/",
+    "opensea.io",
+    "opepen.art",
+    "opepening.art",
+    "uniswap.org",
+    "pageone.gg",
+    "etaversal.banklesshq.com",
+    "nathanbenaich.substack.com"
+  ],
+  "PATHS_TO_IGNORE": [
+    "/",
+    "/about",
+    "/subscribe",
+    "/app",
+    "/account",
+    "/signup",
+    "/join",
+    "/disclosures",
+    "/@thisweekindefi",
+    "/comments",
+    "/dashboard",
+    "/@tolks"
+  ],
+  "UNSUBSCRIBE_KEYWORDS": [
+    "unsubscribe",
+    "optout",
+    "disable_email"
+  ],
+  "LINKS_CLASSES_TO_IGNORE": [
+    "tw-text-substack-secondary tw-underline"
+  ],
+  "LINK_TEXT_TO_IGNORE": [
+    "",
+    "Open in app",
+    "online",
+    "Read Online",
+    "Share",
+    "William M. Peaster",
+    "Bankless newsletter",
+    "Subscribe",
+    "Uniswap Labs",
+    "Metaversal",
+    "Like",
+    "Comment",
+    "Restack",
+    "Unsubscribe",
+    "👉 Get Started Now!",
+    "View in browser",
+    "Read this newsletter on tokenterminal.com",
+    "Click here to unsubscribe.",
+    "investment disclosures here",
+    "Upgrade to paid",
+    "Joel John",
+    "Join the community",
+    "Powered by beehiiv",
+    "Alongside",
+    "See the Interactive Chart",
+    "Pledge your support",
+    "Visit Kraken.com to learn more",
+    "👉 Visit Kraken.com to learn more and open an account today",
+    "Explore the Terminal",
+    "@joel_john95",
+    "👇",
+    "Memecoins CreatorsTeam of Web3 developers.We create and launch MEMECOINS for you, fast.DM us if interested. https://twitter.com/creatememecoins",
+    "here",
+    "https://twitter.com/genesisblockpod",
+    "Share it!",
+    "Twitter",
+    "LinkedIn",
+    "Instagram",
+    "YouTube",
+    "Nathan Benaich",
+    "Othmane Sebbouh",
+    "RSVP here"
+  ]
+}

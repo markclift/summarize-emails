@@ -1,5 +1,7 @@
 .env
 /.venv
+/.vscode
 gmail-credentials.json
-/src/__pycache__
+__pycache__/
 token.pickle
+/data
