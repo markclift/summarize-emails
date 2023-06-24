@@ -21,3 +21,10 @@ The `config.json` file contains settings for email summarization, link crawling,
 ## Usage
 
 Run the `main.py` script to start the email summarization process. The script will authenticate with the Gmail API, retrieve emails, generate and consolidate topics, and send a summary email.
+
+## Todo
+
+1. Enable more weight to be placed on specified topics of interest
+2. Store source data in vector store enabling user to dive deeper into the summaries as required
+3. Add podcasts and other sources to summarise
+4. ...?

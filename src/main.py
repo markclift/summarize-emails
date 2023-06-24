@@ -1,5 +1,5 @@
 import math
-from config import EMAIL_LIST, SUMMARIZE_EMAIL_MODEL, SUMMARIZE_LINKS_MODEL
+from config import EMAIL_LIST, SUMMARIZE_EMAIL_MODEL, SUMMARIZE_LINKS_MODEL, SUMMARIZE_LINKS_BACKUP_MODEL
 from scraping.email_interface import authenticate_gmail, create_email, get_cleaned_emails_and_links, mark_email_as_processed, send_email
 from scraping.link_processor import find_redirect_urls, is_filtered
 from ai.ai_interface import AI_Interface
@@ -11,14 +11,15 @@ logging.basicConfig(level=logging.INFO)
 
 DATA_FOLDER='data/'
 TOPICS_OF_INTEREST=["AI", "Decentralized Identity"] #TODO 
-WINDOW_DAYS=7
-MAX_EMAILS = -1 #TODO: set to -1 in prod
+WINDOW_DAYS=10
+MAX_EMAILS = -1 #TODO: Use for testing. Set to -1 in prod
+MAX_SUMMARIES = -1 #TODO: Use for testing. Set to -1 in prod
 
 def get_suggested_topics(num_tokens):
     if num_tokens < 400:
         return 1
     else:
-        return math.ceil((num_tokens - 400 + 1) / 200) + 1
+        return min(math.ceil((num_tokens - 400 + 1) / 200) + 1,10)
 
 def download_link_contents(emails_with_links):
     for count, email_object in enumerate(emails_with_links, 1):
@@ -47,11 +48,12 @@ def generate_topics(emails_with_links, crawl_links, ai_interface):
 
         if crawl_links == True:
             for count_link, link in enumerate(email_object.Links_list, 1):
+                if count_link == MAX_SUMMARIES-1: break #For testing so we don't have to wait forever
                 if link.tokens > 100:
                     num_topics = get_suggested_topics(link.tokens)
                     logging.info(f"\nSummarising link {count_link} of {len(email_object.Links_list)}: "+ link.final_url + f" (in email {count} of {len(emails_with_links)}): " + email_object.subject_value)
                     logging.info("Link tokens: "+ str(link.tokens))
-                    topics.extend(ai_interface.split_and_generate_topics_and_summaries(link.contents, SUMMARIZE_LINKS_MODEL, num_topics))
+                    topics.extend(ai_interface.split_and_generate_topics_and_summaries(link.contents, SUMMARIZE_LINKS_MODEL, SUMMARIZE_LINKS_BACKUP_MODEL, num_topics))
                 else: logging.info(f"\Skipping link {count_link} of {len(email_object.Links_list)} (in email {count} of {len(emails_with_links)}) because too short ({str(link.tokens)} tokens)")
     return topics
 
@@ -60,13 +62,11 @@ def consolidate_topics(topics, ai_interface):
     logging.info('\n\n==============================================================\n\n')
 
     suggested_topic_groupings = ai_interface.group_topics(topics)
-    out = ai_interface.summarize_groups(topics, suggested_topic_groupings, summary_num_words = 400)
-    topics_final = out['stage_2_outputs']
+    topics_final = ai_interface.summarize_groups(suggested_topic_groupings, summary_num_words = 400)
 
     logging.info('\n\n==============================================================\n')
     for count, topic in enumerate(topics_final,1):
         logging.info(f"\nTopic {count} of {len(topics_final)}: " + topic['topic_title'] + '\n' + topic['topic_summary'])
-    logging.info(out['final_summary'])
     logging.info('\nTotal model cost: $' + str(round(ai_interface.get_total_cost(),2)))
     
     return topics_final

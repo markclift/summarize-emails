@@ -1,29 +1,66 @@
 {
   "MODELS": {
-    "SUMMARIZE_EMAIL": "gpt-3.5-turbo",
+    "SUMMARIZE_EMAIL": "gpt-3.5-turbo-16k",
     "SUMMARIZE_LINKS": "gpt-3.5-turbo",
+    "SUMMARIZE_LINKS_BACKUP": "gpt-3.5-turbo-16k",
+    "EMBEDDINGS": "text-embedding-ada-002",
     "CONSOLIDATE_TITLES": "gpt-4",
-    "MAP_REDUCE_TOPICS": "text-davinci-003"
+    "SUMMARIZE_SUMMARIES": "gpt-3.5-turbo-16k"
+  },
+  "MODEL_CONFIGS": {
+    "gpt-4": {
+      "max_tokens_input": 5800,
+      "max_tokens_response": 2000,
+      "cost_per_1k_tokens_prompt": 0.03,
+      "cost_per_1k_tokens_completion": 0.06
+    },
+    "gpt-3.5-turbo": {
+      "max_tokens_input": 2800,
+      "max_tokens_response": 1000,
+      "cost_per_1k_tokens_prompt": 0.0015,
+      "cost_per_1k_tokens_completion": 0.002
+    },
+    "gpt-3.5-turbo-16k": {
+      "max_tokens_input": 13800,
+      "max_tokens_response": 2000,
+      "cost_per_1k_tokens_prompt": 0.003,
+      "cost_per_1k_tokens_completion": 0.004
+    },
+    "text-embedding-ada-002": {
+      "max_tokens_input": 8000,
+      "max_tokens_response": 0,
+      "cost_per_1k_tokens_prompt": 0.0001,
+      "cost_per_1k_tokens_completion": 0.0001
+    }
   },
   "EMAIL_LIST": [
     {
       "subject": "😎 Crypto Newsletter Summary!",
-      "labels": ["3-news-crypto-news"],
+      "labels": [
+        "3-news-crypto-news"
+      ],
       "crawl_links": true
     },
     {
       "subject": "🤖 AI Newsletter Summary!",
-      "labels": ["3-news-ai-news"],
+      "labels": [
+        "3-news-ai-news"
+      ],
       "crawl_links": false
     },
     {
       "subject": "🤓 John Authors Summary!",
-      "labels": ["3-news-john-authers"],
+      "labels": [
+        "3-news-john-authers"
+      ],
       "crawl_links": false
     },
     {
       "subject": "📱 Tech News Summary!",
-      "labels": ["3-news-tech-news", "3-news-stratechery"],
+      "labels": [
+        "3-news-tech-news",
+        "3-news-stratechery"
+      ],
       "crawl_links": false
     }
   ],
