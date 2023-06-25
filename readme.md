@@ -1,8 +1,8 @@
 # Summarize Emails
 
-This project is designed to process and summarize emails and their associated links using the OpenAI API. It fetches emails from a Gmail account, extracts links, generates topics, consolidates topics, and sends a summary email.
+This project is designed to process and summarize email newsletters and their associated links using the OpenAI API. It fetches emails from a Gmail account, extracts links (if specified in the config file), generates topics, groups and consolidates topics, and sends a summary email.
 
-This Readme.md file was generated using OpenAI and the summarize-repo-for-GPT project found here: https://github.com/markclift/summarize-repo-for-GPT.
+The method of summarization is custom-designed because the closest "in-built" option I could find was LangChain's MapReduce, which doesn't do a great job. Here we first extract a bunch of topics, then cluster them using KMeans, then summarize the clusters. 
 
 ## License
 
@@ -27,4 +27,6 @@ Run the `main.py` script to start the email summarization process. The script wi
 1. Enable more weight to be placed on specified topics of interest
 2. Store source data in vector store enabling user to dive deeper into the summaries as required
 3. Add podcasts and other sources to summarise
-4. ...?
+4. Update to use the new Function Calling functionality here: https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb
+5. This will still error if given too much data to summarize which might result in a final call of above 16k tokens. I have found that roughly 20 emails including links is a maximum to process (which for me is around 2 weeks or so)
+6. ...?

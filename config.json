@@ -4,7 +4,8 @@
     "SUMMARIZE_LINKS": "gpt-3.5-turbo",
     "SUMMARIZE_LINKS_BACKUP": "gpt-3.5-turbo-16k",
     "EMBEDDINGS": "text-embedding-ada-002",
-    "CONSOLIDATE_TITLES": "gpt-4",
+    "CONSOLIDATE_TITLES": "gpt-3.5-turbo-16k",
+    "GENERATE_TITLE": "gpt-3.5-turbo",
     "SUMMARIZE_SUMMARIES": "gpt-3.5-turbo-16k"
   },
   "MODEL_CONFIGS": {

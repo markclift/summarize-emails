@@ -51,7 +51,7 @@ def generate_topics(emails_with_links, crawl_links, ai_interface):
                 if count_link == MAX_SUMMARIES-1: break #For testing so we don't have to wait forever
                 if link.tokens > 100:
                     num_topics = get_suggested_topics(link.tokens)
-                    logging.info(f"\nSummarising link {count_link} of {len(email_object.Links_list)}: "+ link.final_url + f" (in email {count} of {len(emails_with_links)}): " + email_object.subject_value)
+                    logging.info(f"\nSummarising link {count_link} of {len(email_object.Links_list)} (in email {count} of {len(emails_with_links)}): "+ link.final_url)
                     logging.info("Link tokens: "+ str(link.tokens))
                     topics.extend(ai_interface.split_and_generate_topics_and_summaries(link.contents, SUMMARIZE_LINKS_MODEL, SUMMARIZE_LINKS_BACKUP_MODEL, num_topics))
                 else: logging.info(f"\Skipping link {count_link} of {len(email_object.Links_list)} (in email {count} of {len(emails_with_links)}) because too short ({str(link.tokens)} tokens)")
@@ -62,7 +62,7 @@ def consolidate_topics(topics, ai_interface):
     logging.info('\n\n==============================================================\n\n')
 
     suggested_topic_groupings = ai_interface.group_topics(topics)
-    topics_final = ai_interface.summarize_groups(suggested_topic_groupings, summary_num_words = 400)
+    topics_final = ai_interface.summarize_groups(suggested_topic_groupings)
 
     logging.info('\n\n==============================================================\n')
     for count, topic in enumerate(topics_final,1):

@@ -11,6 +11,7 @@ from scipy.spatial.distance import cosine
 import tiktoken
 from config import (
     CONSOLIDATE_TITLES_MODEL,
+    GENERATE_TITLE_MODEL,
     SUMMARIZE_SUMMARIES_MODEL,
     EMBEDDINGS_MODEL,
 )
@@ -39,21 +40,29 @@ TOPICS_USER_PROMPT = (
     + NOT_FOUND_TXT
     + """'. Here is the text:\n\n{text_to_summarize}\n\n\nTOPICS:"""
 )
-TITLE_SYSTEM_PROMPT = """You are a wise being able to summarize text succicently. You Return your answer in a numbered list, with a new line separating each title as in these examples: 
+TITLE_GROUP_SYSTEM_PROMPT = """You are a wise being designed to generate succint and informative titles for some text, where each title starts with the most appropirate emoji for it. You return your answer in a numbered list, with a new line separating each title as in these examples: 
         1. ❄️ Title 1
         2. 🏆 Title 2
         3. 🚀 Title 3"""
-TITLE_USER_PROMPT = """Write an informative title that summarizes each of the following groups of titles. Make sure that the titles capture as much information as possible, 
-        and do not overlap with each other. Add the most relevant emoji to the start of each title:
+TITLE_GROUP_USER_PROMPT = """Write an informative title that summarizes each of the following groups of titles. Make sure that the titles capture as much information as possible and do not overlap with each other. Add the most relevant emoji to the start of each title:
         {text}
 
         TITLES:
         """
-FINAL_SUMMARIES_SYSTEM_PROMPT = "You are a wise being, able to summarize text clearly."
-FINAL_SUMMARIES_USER_PROMPT = """Write a 500-word summary of the following, removing duplicate information:
-{text}
-    
-    500-WORD SUMMARY:"""
+TITLE_SINGLE_SYSTEM_PROMPT = """You are a wise being designed to generate succint and informative titles for some text, where each title starts with the most appropirate emoji for it. You return your answer as a single line of text containing around 10 words, like this example: 
+        🏆 Title 1"""
+TITLE_SINGLE_USER_PROMPT = """Write an informative title for the following text. Add the most relevant emoji to the start of the title:
+        {text}
+
+        TITLE:
+        """
+FINAL_SUMMARIES_SYSTEM_PROMPT = """You summarize text clearly into a roughly 200-word summary with multiple paragraphs. You retain as much information as possible in the summary whilst removing duplicate content. Use short paragraphs to enhance readability and separate each paragraph with an empty line."""
+FINAL_SUMMARIES_USER_PROMPT = """Summarize the following text:
+
+        {text}
+
+        SUMMARY:
+        """
 
 
 class AI_Interface:
@@ -106,7 +115,7 @@ class AI_Interface:
                 topic_dicts.append(topic_dict)
 
         return topic_dicts
-
+    
     def _generate_topics_and_summaries(self, chunks: List[str], model, num_topics=10):
         topics = []
         for chunk in chunks:
@@ -265,8 +274,8 @@ class AI_Interface:
 
         return suggested_topic_groupings
 
-    def summarize_titles(self, topics_titles_concat_all):
-        output = self._generate_chat_completion(self.get_model(CONSOLIDATE_TITLES_MODEL), TITLE_SYSTEM_PROMPT, TITLE_USER_PROMPT.replace("{text}", topics_titles_concat_all), 1000)
+    def summarize_groups_of_titles(self, topics_titles_concat_all):
+        output = self._generate_chat_completion(self.get_model(CONSOLIDATE_TITLES_MODEL), TITLE_GROUP_SYSTEM_PROMPT, TITLE_GROUP_USER_PROMPT.replace("{text}", topics_titles_concat_all), 1000)
 
         # Extract the message content from the chat output
         titles = output.split("\n")
@@ -275,7 +284,7 @@ class AI_Interface:
         titles = [t.strip() for t in titles if t.strip() != ""]
         return titles
     
-    def summarize_groups(self, suggested_topic_groupings, summary_num_words=500):
+    def summarize_groups(self, suggested_topic_groupings):
         start = datetime.now()
         print(f"summarize_groups start time {start}")
 
@@ -291,26 +300,18 @@ class AI_Interface:
             topics_data.append(topic_data)
 
         # Get a list of each community's summaries (concatenated)
-        topics_summary_concat = [c["summaries_concat"] for c in topics_data]
+        topics_summaries_concat = [c["summaries_concat"] for c in topics_data]
         topics_titles_concat = [c["titles_concat"] for c in topics_data]
         print("Suggested topic groupings: " + str(topics_titles_concat))
 
         # Concat into one long string to do the topic title creation
-        topics_titles_concat_all = """"""
-        for i, c in enumerate(topics_titles_concat):
-            topics_titles_concat_all += f"""{i+1}. {c}
-            """
-        titles = self.summarize_titles(topics_titles_concat_all)
-
-        # Concat into one long string to do the topic title creation
-        summaries=[]
-        for summary in topics_summary_concat:
-            summaries.append(self._generate_chat_completion(self.get_model(SUMMARIZE_SUMMARIES_MODEL), FINAL_SUMMARIES_SYSTEM_PROMPT, FINAL_SUMMARIES_USER_PROMPT.replace("{text}", summary), 1200))
-
-        final_outputs = [
-            {"topic_title": t, "topic_summary": s.replace("\n", "").strip()}
-            for t, s in zip(titles, summaries)
-        ]
+        final_outputs=[]
+        for summaries in topics_summaries_concat:
+            summary = self._generate_chat_completion(self.get_model(SUMMARIZE_SUMMARIES_MODEL), FINAL_SUMMARIES_SYSTEM_PROMPT, FINAL_SUMMARIES_USER_PROMPT.replace("{text}", summaries), 1200)
+            title = self._generate_chat_completion(self.get_model(GENERATE_TITLE_MODEL), TITLE_SINGLE_SYSTEM_PROMPT, TITLE_SINGLE_USER_PROMPT.replace("{text}", summary), 100)
+            final_outputs.append(
+                {"topic_title": title, "topic_summary": summary.replace("\n", "").strip()}
+            )
 
         end = datetime.now()
         duration = int((end - start).total_seconds())
