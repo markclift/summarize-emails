@@ -174,6 +174,7 @@ def mark_email_as_processed(service, email_id):
 
 def create_email(to, subject, topics_final, cost, email_list):
     
+    cost = "{:.2f}".format(cost)
     email_body = f"<p>The following emails were summarised with a cost of ${cost}:</p><ul>"
     for email in email_list:
         # use regex to remove the timezone abbreviation
