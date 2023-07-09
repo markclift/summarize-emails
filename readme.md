@@ -12,7 +12,7 @@ This project is licensed under the AGPL-3.0 License.
 
 1. Clone the repository.
 2. Install the required dependencies listed in `requirements.txt`.
-3. Set up the `.env` file using the provided `.env.example` file. Input your GitHub API token, email address, and OpenAI API token, and rename the file to `.env`.
+3. Set up the `.env` file using the provided `.env.example` file. Input your email address and OpenAI API key, and rename the file to `.env`.
 
 ## Configuration
 
