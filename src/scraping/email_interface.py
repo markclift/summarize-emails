@@ -187,7 +187,7 @@ def create_email(to, subject, topics_final, cost, email_list):
     # Append topics_final to email_body
     for count, topic in enumerate(topics_final, 1):
         clean_title = re.sub('^\d+\.\s', '', topic['topic_title'])
-        email_body += f"<p><b>Topic {count} of {len(topics_final)}: {clean_title}</b></p>"
+        email_body += f"<p><b><u>Topic {count} of {len(topics_final)}: {clean_title}</u></b></p>"
         email_body += f"<p>{topic['topic_summary']}</p>"
     
     """Create a raw RFC 2822 formatted message."""

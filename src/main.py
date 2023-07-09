@@ -9,7 +9,6 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-DATA_FOLDER='data/'
 TOPICS_OF_INTEREST=["AI", "Decentralized Identity"] #TODO 
 WINDOW_DAYS=10
 MAX_EMAILS = -1 #TODO: Use for testing. Set to -1 in prod
@@ -83,6 +82,7 @@ def main():
     
     for email_to_create in EMAIL_LIST:
         logging.info(f"CREATING: {email_to_create['subject']} using these email labels: {email_to_create['labels']}")
+        start_cost=ai_interface.get_total_cost()
 
         # Retrieve list of emails from Gmail
         emails_with_links = get_cleaned_emails_and_links(gmail_service, WINDOW_DAYS, email_to_create['labels'], MAX_EMAILS)
@@ -97,7 +97,8 @@ def main():
             topics_final = consolidate_topics(topics_initial, ai_interface)
 
             # Insert the summary email
-            message = create_email(os.getenv('MY_EMAIL_ADDRESS'), email_to_create['subject'], topics_final, ai_interface.get_total_cost(), emails_with_links)
+            cost=ai_interface.get_total_cost()-start_cost
+            message = create_email(os.getenv('MY_EMAIL_ADDRESS'), email_to_create['subject'], topics_final, cost, emails_with_links)
             send_email(gmail_service, 'me', message)
 
             # Mark emails as processed.

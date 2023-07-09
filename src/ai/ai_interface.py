@@ -49,15 +49,15 @@ TITLE_GROUP_USER_PROMPT = """Write an informative title that summarizes each of 
 
         TITLES:
         """
-TITLE_SINGLE_SYSTEM_PROMPT = """You are a wise being designed to generate succint and informative titles for some text, where each title starts with the most appropirate emoji for it. You return your answer as a single line of text containing around 10 words, like this example: 
-        🏆 Title 1"""
-TITLE_SINGLE_USER_PROMPT = """Write an informative title for the following text. Add the most relevant emoji to the start of the title:
+TITLE_SINGLE_SYSTEM_PROMPT = """You are a wise being designed to generate succinct and informative 10-word summaries of some text that encompass all of the topics contained within the text. Each summary starts with the most appropriate emoji for it. If the text includes unrelated topics, try to refer to a topic in your summary that encompasses all of the unrelated topics. You return your answer as a single line of text containing around 10 words, like this example: 
+        🏆 Summary 1"""
+TITLE_SINGLE_USER_PROMPT = """Write a roughly 10-word summary (no more than 20 words) of the following text that encompasses all of the topics contained within the text. If the text includes unrelated topics, try to refer to a topic that encompasses all of the unrelated topics. Add the most relevant emoji to the start of the summary:
         {text}
 
-        TITLE:
+        SUMMARY:
         """
-FINAL_SUMMARIES_SYSTEM_PROMPT = """You summarize text clearly into a roughly 200-word summary with multiple paragraphs. You retain as much information as possible in the summary whilst removing duplicate content. Use short paragraphs to enhance readability and separate each paragraph with an empty line."""
-FINAL_SUMMARIES_USER_PROMPT = """Summarize the following text:
+FINAL_SUMMARIES_SYSTEM_PROMPT = """You summarize text clearly into a roughly 200-word summary which retains as much information as possible from the original text whilst removing duplicate content. To enhance readability, you use multiple short paragraphs and you return your answer in html format where the most important words from each sentence, including the subject and object and any company names etc are always wrapped in bold <b> html tags."""
+FINAL_SUMMARIES_USER_PROMPT = """Summarize the following text clearly into a roughly 200-word summary which retains as much information as possible from the original text whilst removing duplicate content. To enhance readability, use multiple short paragraphs and return your answer in html format where the most important words from each sentence, including the subject and object and any company names etc are always wrapped in bold <b> html tags. Text:
 
         {text}
 
@@ -307,8 +307,8 @@ class AI_Interface:
         # Concat into one long string to do the topic title creation
         final_outputs=[]
         for summaries in topics_summaries_concat:
-            summary = self._generate_chat_completion(self.get_model(SUMMARIZE_SUMMARIES_MODEL), FINAL_SUMMARIES_SYSTEM_PROMPT, FINAL_SUMMARIES_USER_PROMPT.replace("{text}", summaries), 1200)
-            title = self._generate_chat_completion(self.get_model(GENERATE_TITLE_MODEL), TITLE_SINGLE_SYSTEM_PROMPT, TITLE_SINGLE_USER_PROMPT.replace("{text}", summary), 100)
+            summary = self._generate_chat_completion(self.get_model(SUMMARIZE_SUMMARIES_MODEL), FINAL_SUMMARIES_SYSTEM_PROMPT, FINAL_SUMMARIES_USER_PROMPT.replace("{text}", summaries), 700)
+            title = self._generate_chat_completion(self.get_model(GENERATE_TITLE_MODEL), TITLE_SINGLE_SYSTEM_PROMPT, TITLE_SINGLE_USER_PROMPT.replace("{text}", summary), 50)
             final_outputs.append(
                 {"topic_title": title, "topic_summary": summary.replace("\n", "").strip()}
             )
