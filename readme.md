@@ -1,8 +1,11 @@
 # Summarize Emails
 
-This project is designed to process and summarize email newsletters and their associated links using the OpenAI API. It fetches emails from a Gmail account, extracts links (if specified in the config file), generates topics, groups and consolidates topics, and sends a summary email.
+This project is designed to process and summarize email newsletters and their associated links using the OpenAI API. It fetches emails from a Gmail account, extracts links (if specified in the config file), generates topics, groups and consolidates topics, and sends a new summary email to your own inbox.
 
 The method of summarization is custom-designed because the closest "in-built" option I could find was LangChain's MapReduce, which doesn't do a great job. Here we first extract a bunch of topics, then cluster them using KMeans, then summarize the clusters. 
+
+<img width="645" alt="Screenshot 2023-07-30 at 17 07 06" src="https://github.com/markclift/summarize-emails/assets/7832264/8e6e3021-6a70-4106-98ca-c7bdeaaaab0d">
+<img width="635" alt="Screenshot 2023-07-30 at 17 07 23" src="https://github.com/markclift/summarize-emails/assets/7832264/d6217c21-2a52-46a6-a1e2-9b82128fc4e3">
 
 ## License
 
