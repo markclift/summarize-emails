@@ -40,7 +40,7 @@
       "labels": [
         "3-news-crypto-news"
       ],
-      "crawl_links": true
+      "crawl_links": false
     },
     {
       "subject": "🤖 AI Newsletter Summary!",

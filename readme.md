@@ -28,6 +28,7 @@ Run the `main.py` script to start the email summarization process. The script wi
 2. Store source data in vector store enabling user to dive deeper into the summaries as required
 3. Add podcasts and other sources to summarise
 4. Update to use the new Function Calling functionality here: https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb
-5. Launch as a chrome extension?
-6. This will still error if given too much data to summarize which might result in a final call of above 16k tokens. I have found that roughly 20 emails including links is a maximum to process (which for me is around 2 weeks or so)
-7. ...?
+5. Update to use the newest text summarization prompt techniques, eg https://twitter.com/AlphaSignalAI/status/1703825582889263473
+6. Launch as a chrome extension?
+7. This will still error if given too much data to summarize which might result in a final call of above 16k tokens. I have found that roughly 20 emails including links is a maximum to process (which for me is around 2 weeks or so)
+8. ...?
